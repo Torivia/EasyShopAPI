@@ -64,7 +64,7 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao
     {
         List<Product> products = new ArrayList<>();
 
-        String sql = "SELECT * FROM products " +
+        String sql = "SELECT * FROM products " + //its already done for me! do you know how i was able to reference product DAO Ok let me show u :D
                     " WHERE category_id = ? ";
 
         try (Connection connection = getConnection())
