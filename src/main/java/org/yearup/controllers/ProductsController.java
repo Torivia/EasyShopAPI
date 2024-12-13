@@ -23,7 +23,6 @@ public class ProductsController
     {
         this.productDao = productDao;
     }
-
     @GetMapping("")
     @PreAuthorize("permitAll()")
     public List<Product> search(@RequestParam(name="cat", required = false) Integer categoryId,
@@ -38,10 +37,10 @@ public class ProductsController
         }
         catch(Exception ex)
         {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "5Oops... our bad.");
         }
     }
-
+//NOTE ask remsey, find out, does this need a slash before it?
     @GetMapping("{id}")
     @PreAuthorize("permitAll()")
     public Product getById(@PathVariable int id ) {
@@ -56,11 +55,11 @@ public class ProductsController
         }
         catch(Exception ex)
         {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "4Oops... our bad.");
         }
     }
 
-    @PostMapping()
+    @PostMapping("")
     @PreAuthorize("hasRole('ROLE_ADMIN')") //IM GLAD THIS COULD BE OF HELP
     public Product addProduct(@RequestBody Product product)
     {
@@ -70,10 +69,10 @@ public class ProductsController
         }
         catch(Exception ex)
         {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "3Oops... our bad.");
         }
     }
-//FIXME: This looks kinda fishy.....creating a product?
+
     @PutMapping("{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void updateProduct(@PathVariable int id, @RequestBody Product product)
@@ -84,7 +83,7 @@ public class ProductsController
         }
         catch(Exception ex)
         {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "2Oops... our bad.");
         }
     }
 
@@ -103,7 +102,7 @@ public class ProductsController
         }
         catch(Exception ex)
         {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "1Oops... our bad.");
         }
     }
 }

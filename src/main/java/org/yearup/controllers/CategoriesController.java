@@ -10,29 +10,12 @@ import org.yearup.models.Category;
 import org.yearup.models.Product;
 
 import java.util.List;
-
-import javax.validation.Valid;
-
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import org.yearup.models.Profile;
-import org.yearup.data.ProfileDao;
-import org.yearup.data.UserDao;
-import org.yearup.models.authentication.LoginDto;
-import org.yearup.models.authentication.LoginResponseDto;
-import org.yearup.models.authentication.RegisterUserDto;
-import org.yearup.models.User;
-import org.yearup.security.jwt.JWTFilter;
-import org.yearup.security.jwt.TokenProvider;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import java.util.List;
+
 
 @RestController
 @CrossOrigin
@@ -57,7 +40,7 @@ public class CategoriesController {
         // Retrieve and return all categories
         return categoryDao.getAllCategories();
     }
-//TODO: THIS IS "AMBIGUOUS MAPPING"
+//done, NOTE if you dont put any annotation afterwards, you will get "AMBIGUOUS MAPPING" error
     @GetMapping("/{id}")
     public Category getById(@PathVariable int id)
     {
@@ -89,11 +72,11 @@ public class CategoriesController {
 
     // add annotation to call this method for a PUT (update) action - the url path must include the categoryId ({id})
     //TODO: find out what annotation i need after @PutMapping
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     // done, added annotation to ensure that only an ADMIN can call this function
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void updateCategory(@PathVariable int id, @RequestBody Category category)
-    {//FIXME: this looks like potentially a bug...it looks like ur just creating something?
+    {//done, this had a bug in it that was using .create instead of .update
         try
         {
             categoryDao.update(id, category);
@@ -105,7 +88,7 @@ public class CategoriesController {
     }
 
     // done, added annotation to call this method for a DELETE action - the url path must include the categoryId ({id})
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     // done, added annotation to ensure that only an ADMIN can call this function
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void deleteCategory(@PathVariable int id)
