@@ -40,7 +40,7 @@ public class ProductsController
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "5Oops... our bad.");
         }
     }
-//NOTE ask remsey, find out, does this need a slash before it?
+//NOTE does not need slash before it
     @GetMapping("{id}")
     @PreAuthorize("permitAll()")
     public Product getById(@PathVariable int id ) {

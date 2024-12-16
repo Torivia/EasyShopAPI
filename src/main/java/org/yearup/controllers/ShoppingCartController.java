@@ -12,7 +12,7 @@ import org.yearup.models.ShoppingCart;
 import org.yearup.models.User;
 
 import java.security.Principal;
-//NOTE ask remsey if Shopping cart controller needs a MySqlDao thingy like the rest
+//NOTE ask remsey if Shopping cart controller needs a MySqlDao thingy like the rest; yes it does
 
 // done, converted this class to a REST controller
 @RestController
@@ -48,18 +48,18 @@ public class ShoppingCartController
             int userId = user.getId();
 
             // use the shoppingcartDao to get all items in the cart and return the cart
-            return null;
+            return null;//ShoppingCartDao.getByUserId(userId);
         }
         catch(Exception e)
         {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad. Something went wrong with getting the cart!");
         }
     }
 
     // add a POST method to add a product to the cart - the url should be
     // https://localhost:8080/cart/products/15 (15 is the productId to be added
 @PostMapping("/products/{id}")
-    //NOTE ask remsey, does this need PreAuthorize??
+    //NOTE does not need Preauthorize
 
     public ShoppingCart addToCart(Principal principal, @PathVariable int id)
     {//add necessary stuffs

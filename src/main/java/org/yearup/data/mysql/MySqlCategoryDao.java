@@ -81,38 +81,32 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao {
     public Category create(Category category)
     {
 
-        String sql = "INSERT INTO categories(category_id, name, description) " +
-                " VALUES (?, ?, ?);";
+        String sql = "INSERT INTO categories(name, description) " +
+                " VALUES (?, ?);";
 
-        try (Connection connection = getConnection())
-        {
-            PreparedStatement statement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
-            statement.setInt(1, category.getCategoryId());
-            statement.setString(2, category.getName());
-            statement.setString(3, category.getDescription());
+            statement.setString(1, category.getName());
+            statement.setString(2, category.getDescription());
 
             int rowsAffected = statement.executeUpdate();
-//idk if this works, this is supposed to generate an id #
+
             if (rowsAffected > 0) {
-                // Retrieve the generated keys
-                ResultSet generatedKeys = statement.getGeneratedKeys();
-
-                if (generatedKeys.next()) {
-                    // Retrieve the auto-incremented ID
-                    int orderId = generatedKeys.getInt(1);
-
-                    // get the newly inserted category
-                    return getById(orderId);
+                try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        category.setCategoryId(generatedKeys.getInt(1)); // Set the generated ID
+                    }
                 }
+            } else {
+                throw new RuntimeException("Failed to insert category");
             }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle exceptions appropriately
+            throw new RuntimeException("Error creating category", e);
         }
-        catch (SQLException e)
-        {
-            throw new RuntimeException(e);
-        }
-        return null;
 
+        return category;
     }
 //TODO ADJHFKJADHFH
     @Override
