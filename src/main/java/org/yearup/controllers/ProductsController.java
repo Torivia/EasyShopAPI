@@ -60,7 +60,7 @@ public class ProductsController
     }
 
     @PostMapping("")
-    @PreAuthorize("hasRole('ROLE_ADMIN')") //IM GLAD THIS COULD BE OF HELP
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Product addProduct(@RequestBody Product product)
     {
         try

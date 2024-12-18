@@ -6,8 +6,22 @@ import java.util.Map;
 
 public class ShoppingCart
 {
+    private int userId;
+    private int productId;
+    private int quantity;
+
+    public ShoppingCart() {
+    }
+
+    public ShoppingCart(int userId, int productId, int quantity) {
+        this.userId = userId;
+        this.productId = productId;
+        this.quantity = quantity;
+    }
+
     private Map<Integer, ShoppingCartItem> items = new HashMap<>();
-//shopping list^
+
+    //shopping list^
     public Map<Integer, ShoppingCartItem> getItems()
     {
         return items;

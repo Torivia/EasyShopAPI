@@ -19,7 +19,7 @@ import java.security.Principal;
 //done, only logged in users should have access to these actions
 @PreAuthorize("hasRole('ROLE_USER')")
 //NOTE putting this in as a url start
-@RequestMapping("/cart")
+
 public class ShoppingCartController
 {
 
@@ -28,16 +28,92 @@ public class ShoppingCartController
     private UserDao userDao;
     private ProductDao productDao;
 
-//    public ShoppingCartController(ShoppingCartDao shoppingCartDao, UserDao userDao, ProductDao productDao) {
-//        this.shoppingCartDao = shoppingCartDao;
-//        this.userDao = userDao;
-//        this.productDao = productDao;
+    @Autowired
+    public ShoppingCartController(ShoppingCartDao shoppingCartDao, UserDao userDao, ProductDao productDao) {
+        this.shoppingCartDao = shoppingCartDao;
+        this.userDao = userDao;
+        this.productDao = productDao;
+    }
+    @GetMapping("/cart") // Added explicit path
+    public ShoppingCart getCart(Principal principal) {
+        try {
+            // Get the currently logged in username
+            String username = principal.getName(); // Find database user by username (not by hardcoded ID)
+            User user = userDao.getByUserName(username);
+            int userId = user.getId(); // Return the shopping cart (you'll need to implement this)
+            return shoppingCartDao.getByUserId(3);
+        } catch (Exception e) {
+            // Add proper error handling
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error retrieving shopping cart");
+        }
+    }
+//    // each method in this controller requires a Principal object as a parameter
+//    //FIXME not sure what mapping is needed, if any
+//    @GetMapping()
+//    public ShoppingCart getCart(Principal principal)
+//    {
+//        try
+//        {//if lines 44-49 are needed to log in...then i probably need to copy/paste this to the rest of the methods
+//            // get the currently logged in username
+//            String userName = principal.getName();
+//            // find database user by userId
+//            User user = userDao.getByUserName(3);
+//            int userId = user.getId();
+//
+//            // use the shoppingcartDao to get all items in the cart and return the cart
+//            return shoppingCartDao.getByUserId(3);
+//        }
+//        catch(Exception e)
+//        {
+//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad. Something went wrong with getting the cart!");
+//        }
 //    }
 
-    // each method in this controller requires a Principal object as a parameter
-    //FIXME not sure what mapping is needed, if any
-    @GetMapping()
-    public ShoppingCart getCart(Principal principal)
+    // add a POST method to add a product to the cart - the url should be
+    // https://localhost:8080/cart/products/15 (15 is the productId to be added
+@PostMapping("/products/{id}")
+    //NOTE does not need Preauthorize
+
+    public ShoppingCart addToCart(Principal principal, @PathVariable int id)
+    {//add necessary stuffs
+        // get the currently logged in username
+        String userName = principal.getName();
+        // find database user by userId
+        User user = userDao.getByUserName(userName);
+        int userId = user.getId();
+
+        //return shoppingCartDao.addingItems(not sure what to put here yet, product id perhaps?);
+        return null;
+    }
+
+
+    // add a PUT method to update an existing product in the cart - the url should be
+    // https://localhost:8080/cart/products/15 (15 is the productId to be updated)
+    // the BODY should be a ShoppingCartItem - quantity is the only value that will be updated
+    @PutMapping("/products/{id}")
+    public void updateCart(@RequestBody Principal principal,@PathVariable int id)
+    {//add necessary stuffs
+        // needs @RequestBody
+        try
+        {
+            // get the currently logged in username
+            String userName = principal.getName();
+            // find database user by userId
+            User user = userDao.getByUserName(userName);
+            int userId = user.getId();
+
+            shoppingCartDao.updateCart(userId, id);
+        }
+        catch(Exception ex)
+        {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad. Something went wrong with updating the cart! :c");
+        }
+    }
+
+    // add a DELETE method to clear all products from the current users cart
+    // https://localhost:8080/cart
+    @DeleteMapping("")
+    public void deleteCart(@RequestBody Principal principal)
     {
         try
         {
@@ -47,42 +123,12 @@ public class ShoppingCartController
             User user = userDao.getByUserName(userName);
             int userId = user.getId();
 
-            // use the shoppingcartDao to get all items in the cart and return the cart
-            return null;//ShoppingCartDao.getByUserId(userId);
+            shoppingCartDao.deleteCart(userId);
         }
-        catch(Exception e)
+        catch(Exception ex)
         {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad. Something went wrong with getting the cart!");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad. Something went wrong with deleting the cart! :c");
         }
-    }
-
-    // add a POST method to add a product to the cart - the url should be
-    // https://localhost:8080/cart/products/15 (15 is the productId to be added
-@PostMapping("/products/{id}")
-    //NOTE does not need Preauthorize
-
-    public ShoppingCart addToCart(Principal principal, @PathVariable int id)
-    {//add necessary stuffs
-        return null;
-    }
-
-
-    // add a PUT method to update an existing product in the cart - the url should be
-    // https://localhost:8080/cart/products/15 (15 is the productId to be updated)
-    // the BODY should be a ShoppingCartItem - quantity is the only value that will be updated
-    @PutMapping("/products/{id}")
-    public void updateCart(Principal principal,@PathVariable int id)
-    {//add necessary stuffs
-        // needs @RequestBody
-
-    }
-
-    // add a DELETE method to clear all products from the current users cart
-    // https://localhost:8080/cart
-    @DeleteMapping("")
-    public void deleteCart(Principal principal)
-    {
-        //a
     }
 
 }
