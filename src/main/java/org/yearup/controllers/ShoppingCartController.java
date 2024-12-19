@@ -9,6 +9,7 @@ import org.yearup.data.ProductDao;
 import org.yearup.data.ShoppingCartDao;
 import org.yearup.data.UserDao;
 import org.yearup.models.ShoppingCart;
+import org.yearup.models.ShoppingCartItem;
 import org.yearup.models.User;
 
 import java.security.Principal;
@@ -16,6 +17,8 @@ import java.security.Principal;
 
 // done, converted this class to a REST controller
 @RestController
+@RequestMapping("/cart")
+@CrossOrigin
 //done, only logged in users should have access to these actions
 @PreAuthorize("hasRole('ROLE_USER')")
 //NOTE putting this in as a url start
@@ -24,9 +27,9 @@ public class ShoppingCartController
 {
 
     // a shopping cart requires
-    private ShoppingCartDao shoppingCartDao;
-    private UserDao userDao;
-    private ProductDao productDao;
+    private final ShoppingCartDao shoppingCartDao;
+    private final UserDao userDao;
+    private final ProductDao productDao;
 
     @Autowired
     public ShoppingCartController(ShoppingCartDao shoppingCartDao, UserDao userDao, ProductDao productDao) {
@@ -34,46 +37,24 @@ public class ShoppingCartController
         this.userDao = userDao;
         this.productDao = productDao;
     }
-    @GetMapping("/cart") // Added explicit path
+    @GetMapping() // Added explicit path
     public ShoppingCart getCart(Principal principal) {
         try {
             // Get the currently logged in username
             String username = principal.getName(); // Find database user by username (not by hardcoded ID)
             User user = userDao.getByUserName(username);
-            int userId = user.getId(); // Return the shopping cart (you'll need to implement this)
-            return shoppingCartDao.getByUserId(3);
+            int userId = user.getId();
+            return shoppingCartDao.getByUserId(userId);
         } catch (Exception e) {
             // Add proper error handling
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error retrieving shopping cart");
         }
     }
-//    // each method in this controller requires a Principal object as a parameter
-//    //FIXME not sure what mapping is needed, if any
-//    @GetMapping()
-//    public ShoppingCart getCart(Principal principal)
-//    {
-//        try
-//        {//if lines 44-49 are needed to log in...then i probably need to copy/paste this to the rest of the methods
-//            // get the currently logged in username
-//            String userName = principal.getName();
-//            // find database user by userId
-//            User user = userDao.getByUserName(3);
-//            int userId = user.getId();
-//
-//            // use the shoppingcartDao to get all items in the cart and return the cart
-//            return shoppingCartDao.getByUserId(3);
-//        }
-//        catch(Exception e)
-//        {
-//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad. Something went wrong with getting the cart!");
-//        }
-//    }
 
     // add a POST method to add a product to the cart - the url should be
     // https://localhost:8080/cart/products/15 (15 is the productId to be added
 @PostMapping("/products/{id}")
     //NOTE does not need Preauthorize
-
     public ShoppingCart addToCart(Principal principal, @PathVariable int id)
     {//add necessary stuffs
         // get the currently logged in username
@@ -87,11 +68,11 @@ public class ShoppingCartController
     }
 
 
-    // add a PUT method to update an existing product in the cart - the url should be
+    // done, add a PUT method to update an existing product in the cart - the url should be
     // https://localhost:8080/cart/products/15 (15 is the productId to be updated)
     // the BODY should be a ShoppingCartItem - quantity is the only value that will be updated
     @PutMapping("/products/{id}")
-    public void updateCart(@RequestBody Principal principal,@PathVariable int id)
+    public void updateCart(@RequestBody ShoppingCartItem item, Principal principal, @PathVariable int id)
     {//add necessary stuffs
         // needs @RequestBody
         try
@@ -113,7 +94,7 @@ public class ShoppingCartController
     // add a DELETE method to clear all products from the current users cart
     // https://localhost:8080/cart
     @DeleteMapping("")
-    public void deleteCart(@RequestBody Principal principal)
+    public void deleteCart(Principal principal)
     {
         try
         {
