@@ -20,7 +20,7 @@ import java.security.Principal;
 @RequestMapping("/cart")
 @CrossOrigin
 //done, only logged in users should have access to these actions
-@PreAuthorize("hasRole('ROLE_USER')")
+@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
 //NOTE putting this in as a url start
 
 public class ShoppingCartController
@@ -64,7 +64,7 @@ public class ShoppingCartController
         int userId = user.getId();
 
         //return shoppingCartDao.addingItems(not sure what to put here yet, product id perhaps?);
-        return null;
+        return shoppingCartDao.addingItems(userId, id);
     }
 
 

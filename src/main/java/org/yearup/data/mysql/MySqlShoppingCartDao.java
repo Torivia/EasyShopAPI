@@ -89,38 +89,92 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
         }
     }
 
+//    @Override
+//    public ShoppingCart addingItems(int userId, int productId) {
+//        String sql = "INSERT INTO shopping_cart (user_id, product_id, quantity) VALUES (?, ?, ?)";
+//        ShoppingCart shoppingCart;
+//        try (Connection connection = dataSource.getConnection();
+//             PreparedStatement statement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+//
+//            statement.setInt(1, userId);
+//            statement.setInt(2, productId);
+//            statement.setInt(3, 1);
+//            shoppingCart = new ShoppingCart(userId, productId, 1);
+//
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+//        return shoppingCart;
+//    }
     @Override
     public ShoppingCart addingItems(int userId, int productId) {
-//        String sql = "INSERT INTO shopping_cart (user_id, product_id, quantity) VALUES (?, ?, ?)";
-        return null;
+        String sql = "INSERT INTO shopping_cart (user_id, product_id, quantity) VALUES (?, ?, ?)";
+        ShoppingCart shoppingCart = new ShoppingCart();
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+
+            // Set parameters for the SQL query
+            statement.setInt(1, userId);
+            statement.setInt(2, productId);
+            statement.setInt(3, 1); // Default quantity to 1
+            //statement.executeUpdate();
+            // Execute the insert operation
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Database error while adding items to the shopping cart.", e);
+        }
+    return getByUserId(userId);
     }
+
 
     @Override
     public void updateCart(int userId, int productId) {
         //sadfaajksjf
     }
 
+//    @Override
+//    public void deleteCart(int userId) {
+//        //TODO check user id, delete WHERE statement DELETE FROM
+//        String sql = "DELETE FROM shopping_cart\n" +
+//                "WHERE user_id = ?";
+//        try (Connection connection = getConnection()) {
+//            PreparedStatement statement = connection.prepareStatement(sql);
+//            statement.setInt(1, userId);
+//            statement.executeUpdate();
+//        } catch (SQLException e) {
+//        throw new RuntimeException(e);
+//        }
+//    }
     @Override
     public void deleteCart(int userId) {
-        //TODO check user id, delete WHERE statement DELETE FROM
-        String sql = "DELETE FROM shopping_cart\n" +
-                "WHERE user_id = ?";
-        try (Connection connection = getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(sql);
+        // SQL query to delete all entries for a specific user_id
+        String sql = "DELETE FROM shopping_cart WHERE user_id = ?";
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            // Set the user ID in the prepared statement
             statement.setInt(1, userId);
-            statement.executeUpdate();
+
+            // Execute the DELETE query
+            int affectedRows = statement.executeUpdate();
+
+            // Optional: Log or handle cases where no rows were deleted
+            if (affectedRows == 0) {
+                System.out.println("No cart found for user ID: " + userId);
+            } else {
+                System.out.println("Deleted " + affectedRows + " items from the cart for user ID: " + userId);
+            }
         } catch (SQLException e) {
-        throw new RuntimeException(e);
+            // Throw a runtime exception with a meaningful message
+            throw new RuntimeException("Failed to delete the shopping cart for user ID: " + userId, e);
         }
     }
-
     protected List<ShoppingCartItem> mapRows(ResultSet row) throws SQLException {
         List<ShoppingCartItem> shoppingCarts = new ArrayList<>();
 
         while (row.next()) {
-//            int userId = row.getInt("user_id");
-//            int productId = row.getInt("product_id");
-//            int quantity = row.getInt("quantity");
             Product product = productDao.getById(row.getInt("product_id"));
             ShoppingCartItem shoppingCartItem = new ShoppingCartItem();
             shoppingCartItem.setProduct(product);
@@ -129,69 +183,9 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
         }
         return shoppingCarts;
     }
-//BOOKMARK to go check on champurrado
-            // Get or create the shopping cart for the user
-//            ShoppingCart shoppingCart = cartMap.get(userId);
-//            if (shoppingCart == null) {
-//                shoppingCart = new ShoppingCart();
-//                cartMap.put(userId, shoppingCart);
-//                shoppingCarts.add(shoppingCart);
-//            }
+}
 
-//            // Create and add the shopping cart item
-//            ShoppingCartItem item = new ShoppingCartItem();
-//            Product product = productDao.getById(productId);
-//            item.setProduct(product);
-//            item.setQuantity(quantity);
-//
-//            // Add the item to the map of items
-//            Map<Integer, ShoppingCartItem> items = shoppingCart.getItems();
-//            items.put(productId, item);
-//
-//            // Use setItems to update the shopping cart's items map
-//            shoppingCart.setItems(items);
-//        }
-//
-//        return shoppingCarts;
-//    }
 
-//    protected List<ShoppingCartItem> mapRows(ResultSet row) throws SQLException {
-//        List<ShoppingCartItem> shoppingCarts = new ArrayList<>();
-//        Map<Integer, ShoppingCart> cartMap = new HashMap<>();
-//
-//        while (row.next()) {
-//            int userId = row.getInt("user_id");
-//            int productId = row.getInt("product_id");
-//            int quantity = row.getInt("quantity");
-//
-//            // Get or create the shopping cart for the user
-//            ShoppingCart shoppingCart = cartMap.get(userId);
-//            if (shoppingCart == null) {
-//                shoppingCart = new ShoppingCart();
-//                cartMap.put(userId, shoppingCart);
-//                shoppingCarts.add(shoppingCart);
-//            }
-//
-//            // Create and add the shopping cart item
-//            ShoppingCartItem item = new ShoppingCartItem();
-//            Product product = productDao.getById(productId);
-//            item.setProduct(product);
-//            item.setQuantity(quantity);
-//
-//            shoppingCart.add(item); // Add the item to the shopping cart
-//        }
-//
-//        return shoppingCarts;
-//    }
-    }
-//protected ShoppingCart mapRows(ResultSet row) throws SQLException
-//{
-//    int userId = row.getInt("user_id");
-//    int productId = row.getInt("product_id");
-//    int quantity = row.getInt("quantity");
-//
-//    return new ShoppingCart(userId, productId, quantity);
-//}
 
 
 
